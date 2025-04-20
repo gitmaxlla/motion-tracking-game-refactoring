@@ -2,6 +2,8 @@ import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
 
 import areCoordsClose from './areCoordsClose'
 
+
+// REF: подобно removeTiedowwnsPoses.ts
 export const tiedownsRemovedPose1 = ({
   poseLandmarks,
 }: Pick<Results, 'poseLandmarks'>): boolean => {

@@ -2,6 +2,13 @@ import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
 
 import areCoordsClose from './areCoordsClose'
 
+
+// REF: положения по сути отличаются только набором параметров для
+//     elbowsLowerThanShoulders &&
+//     right/leftWristLowerThanRight/LeftElbow &&
+//     right/leftWristRight/LeftElbowOnVertLine &&
+//     right/leftIndexOnRightWrist/Elbow
+//     очередной пример, где множество вычислений можно обобщить в класс Landmarks (см. файл ref-notes)
 export const removeTiedownsPose1 = ({
   poseLandmarks,
 }: Pick<Results, 'poseLandmarks'>): boolean => {
@@ -60,6 +67,8 @@ export const removeTiedownsPose2 = ({
   )
 }
 
+// REF: положения 3 и 4 отличаются только параметром 
+//      в переменной leftIndexOnRightElbow -> в функцию
 export const removeTiedownsPose3 = ({
   poseLandmarks,
 }: Pick<Results, 'poseLandmarks'>): boolean => {

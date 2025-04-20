@@ -1,3 +1,5 @@
+// REF: MPStart - назначение файла сразу не понять. Может переименовать, переместить в App т. д.?
+// NITPICK: много импортов, мало переносов строк
 import { useRef, useEffect, useState } from 'react'
 import Webcam from 'react-webcam'
 import {
@@ -43,6 +45,7 @@ const MPStart = () => {
   const webcamRef = useRef<Webcam>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
+  // REF: isEverythingSeen или всё-таки wholePoseDetected/allDetected (или как-то иначе)
   const [isEverythingSeen, setIsEverythingSeen] = useState(false)
 
   const dispatch = useStoreDispatch()
@@ -62,6 +65,9 @@ const MPStart = () => {
   const cameraRef = useRef<Camera | null>(null)
 
   useEffect(() => {
+    // REF: смысл условия? notInitialized()? Вынести в функцию;
+    //      в целом этот useEffect большой и не совсем понятно изначально для чего (может лямбду вынести в функцию?);
+    //      setupMediapipeSolution()?
     if (holisticRef.current === null || cameraRef.current === null) {
       holisticRef.current = new Holistic({
         locateFile: (file) =>
@@ -75,6 +81,7 @@ const MPStart = () => {
         minTrackingConfidence: 0.5,
       })
 
+      // REF: setupCameraFeed()?
       if (webcamRef.current?.video) {
         cameraRef.current = new Camera(webcamRef.current.video, {
           onFrame: async () => {
@@ -93,8 +100,12 @@ const MPStart = () => {
     }
   }, [])
 
+  // REF: Опять же, может вынести функцию и назвать её как-нибудь осмысленно?
   useEffect(() => {
+    // REF: .onResults(onResults) не добавляет никакой смысловой нагрузки;
+    //      хотя бы onResults -> onNewPose?
     const onResults = (results: Results) => {
+      // REF: Вынести в функцию
       if (!canvasRef.current || !webcamRef.current?.video) return
 
       const videoW = webcamRef.current.video.videoWidth
@@ -105,6 +116,8 @@ const MPStart = () => {
       const canvasCtx = canvasRef.current.getContext('2d')
       if (!canvasCtx) return
 
+      // NITPICK: здесь и далее вероятно вполне хватит одной строки
+      //          для указания параметров вместо четырёх / пяти
       canvasCtx.save()
       canvasCtx.clearRect(
         0,
@@ -120,7 +133,11 @@ const MPStart = () => {
         canvasRef.current.height,
       )
 
+      // REF: в чём смысл существования переменной? poseDetected()?
       if (results.poseLandmarks) {
+        // REF: drawEstimatedPose()? 
+        //      -> drawHand(leftHandLandmarks), drawHand(rightHandLandmarks), drawBody()?
+        //      абстракцию ввести бы здесь в общем-то
         drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
           color: 'white',
           lineWidth: 3,
@@ -157,6 +174,12 @@ const MPStart = () => {
         })
       }
 
+      // REF: объявление функции gotoNextLevelFrom переместить к началу processTraining 
+      //      posePredicate -> poseDetected()? 
+      //      много дублирования, следует обернуть в forEach() 
+      //      goToNextLevelFrom -> nextLevelIfPoseAtLevel?
+      //      fromLevel -> from / at (и так LevelFrom / AtLevel)? [больше NITPICK] 
+      //      processTraning -> proceedTraining (будто звучит понятнее)?
       function processTraining(results: Results) {
         goToNextLevelFrom(0, idlePose)
         goToNextLevelFrom(1, removeTiedownsPose1)
@@ -194,21 +217,30 @@ const MPStart = () => {
         ) {
           if (level === fromLevel && posePredicate(results)) {
             dispatch(toNextLevel())
+            // REF: нужен ли return? Если это неочевидно даже для знающих фреймворк, закомментировать, иначе 
+            //      оставить как есть
             return
           }
         }
       }
 
+      // REF: не лучше ли обернуть обе функции под полиморфизм? 
+      //      напр. traning.proceed(results);
+      //      мало деления на блоки переносами строк (не только здесь)
       function processNotTraining(results: Results) {
         function processPose(
           results: Results,
           poseName: string,
           posePredicate: (results: Results) => boolean,
         ): boolean {
+          // NOTE: сказанное о функции выше распространяется и здесь
           if (posePredicate(results)) {
+            // REF: больше функций? 
+            //      switchPose(name), countTowards(poseName)...
             if (notTrainingRef.current.pose === poseName)
               notTrainingRef.current.count += 1
             else notTrainingRef.current.count = 0
+            // NOTE: излишнее присвоение? точно ли не принадлежит к else выше?
             notTrainingRef.current.pose = poseName
             console.log(`${poseName} ${notTrainingRef.current.count}`)
             return true
@@ -217,15 +249,19 @@ const MPStart = () => {
         }
 
         processPose(results, 'idle', idlePose)
+
+        // REF: достаточно просто unfoldWingsDetected
         const unfoldWingsIsDetected = processPose(
           results,
           'wheelChocksRemoved',
           wheelChocksRemovedPose,
         )
+        // REF: новая строка 
         if (!unfoldWingsIsDetected) {
           processPose(results, 'moveAhead', moveAheadPose)
         }
 
+        // REF: Magic Number -> 20 заменить константой
         if (notTrainingRef.current.count >= 20) {
           console.log('aaaaa eto ' + notTrainingRef.current.pose)
           notTrainingRef.current.count = 0
@@ -234,11 +270,16 @@ const MPStart = () => {
         }
       }
 
+      // NITPICK: && читаемее поставить на новой строке, как и
+      //          ||
+      // REF: что вообще означает это условие?
       if (
         results.poseLandmarks &&
         (results.rightHandLandmarks || results.leftHandLandmarks)
       ) {
         setIsEverythingSeen(true)
+        // REF: эта проблема уже описывалось в gameLogicSlice 
+        //      (кстати, почти что дублирующийся код между двумя файлами)
         switch (gameMode) {
           case TRAINING_GAME_MODE:
             processTraining(results)
@@ -254,6 +295,7 @@ const MPStart = () => {
       canvasCtx.restore()
     }
 
+    // NOTE: разве нельзя просто holisticRef.current?.onResults(...)
     if (holisticRef.current) holisticRef.current.onResults(onResults)
   }, [dispatch, gameMode, level])
 

@@ -1,6 +1,8 @@
 import { useStoreSelector } from '../../store/hooks'
 import { levelsData } from '../../store/slices/trainingModeSlice'
 
+
+// NITPICK: poseImage звучит проще?
 const ImageOfPose = () => {
   const level = useStoreSelector((state) => state.trainingMode.level)
 

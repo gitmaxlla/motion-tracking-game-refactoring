@@ -13,6 +13,8 @@ export const idlePose = ({
   const elbowL = poseLandmarks[POSE_LANDMARKS.LEFT_ELBOW]
   const wristL = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST]
 
+  // REF: в rightSide и leftSide дублируется функционал, 
+  //      отличия лишь в передаваемых параметрах -> новая функция
   const rightSide =
     areCoordsClose(shoulderR.x, elbowR.x) &&
     areCoordsClose(shoulderR.x, wristR.x) &&

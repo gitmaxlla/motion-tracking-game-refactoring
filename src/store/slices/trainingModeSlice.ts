@@ -1,6 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
+
+// REF: очевидно, убираем
 //import type { PayloadAction } from '@reduxjs/toolkit'
 
+// NITPICK: можно ещё сильнее рассортировать импорты 
+//          (пустые строки добавить между группами импортов)
 import idleImage from '../../images/idle.png'
 import removeTiedownsImage from '../../images/removeTiedowns.png'
 import wheelChocksRemovedImage from '../../images/wheelChocksRemoved.png'
@@ -13,6 +17,8 @@ import unfoldWings2Image from '../../images/unfoldWings2.png'
 import launchBar1Image from '../../images/launchBar1.png'
 import launchBar2Image from '../../images/launchBar2.png'
 
+// REF: хотя бы в отдельный файл эту переменную убрать, если не 
+//      придумывать разметку для файлов уровней 
 export const levelsData: [string, string | undefined][] = [
   ['adopt an idle pose to start', idleImage],
   ['1.1 show "remove tiedowns" signal', removeTiedownsImage],
@@ -20,6 +26,9 @@ export const levelsData: [string, string | undefined][] = [
   ['1.3 show "remove tiedowns" signal', removeTiedownsImage],
   ['1.4 show "remove tiedowns" signal', removeTiedownsImage],
   ['adopt an idle pose to go to next level', idleImage],
+  // REF: Undefined потому что ещё не сделано,
+  //      или потому что на этом месте ничего не должно быть? 
+  //      Константа emptyImage=undefined в помощь
   ['2.1 show "tiedowns removed" signal', undefined],
   ['2.2 show "tiedowns removed" signal', undefined],
   ['2.3 show "tiedowns removed" signal', undefined],
@@ -47,6 +56,7 @@ export const levelsData: [string, string | undefined][] = [
   ['training finished', undefined],
 ]
 
+// REF: trainingMessage внутри TraningModeState - может просто message/instruction?
 interface TrainingModeState {
   level: number
   trainingMessage: string
@@ -61,13 +71,18 @@ export const trainingModeSlice = createSlice({
   name: 'trainingMode',
   initialState,
   reducers: {
+    // NITPICK : менее нагруженно и так же понятно -> nextLevel()
     toNextLevel: (state) => {
+      // REF: либо уж сразу state.level += 1, либо метод getNextLevel(),
+      //      если планируется сложная логика получения следующего уровня;
+      //      levelsData[nextLevel][0] просится в updateInstruction/Message() т. п.
       const nextLevel = state.level + 1
       state.level = nextLevel
       state.trainingMessage = levelsData[nextLevel][0]
     },
     restart: (state) => {
       state.level = 0
+      // REF: здесь тогда тоже вписывается updateInstruction/Message()
       state.trainingMessage = levelsData[0][0]
     },
   },

@@ -10,6 +10,8 @@ export const stopPose = ({
 >): boolean => {
   if (!rightHandLandmarks || !leftHandLandmarks) return false
 
+  // REF: отличный пример того большого списка параметров, который нужно
+  //      вынести в функции в файле Landmark (смотреть файл ref-notes)
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
 
   const shoulderR = poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER]
@@ -36,10 +38,14 @@ export const stopPose = ({
   const ringMcpL = leftHandLandmarks[13]
   const pinkyMcpL = leftHandLandmarks[17]
 
+  // REF: boolean назван существительным, а не предикатом 
+  //      (rightSideArm -> rightArmInRightPos) и т. д. 
   const rightSideArm = wristR.y < nose.y && shoulderR.y >= elbowR.y
 
   const leftSideArm = wristL.y < nose.y && shoulderL.y >= elbowL.y
 
+  // REF: хотелось бы увидеть особый метод McpLowerThanTip()
+  //      и итерацию по всем массивам частей пальцев
   const rightFist =
     indexMcpR.y < indexTipR.y &&
     middleMcpR.y < middleTipR.y &&

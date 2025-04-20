@@ -33,6 +33,8 @@ export const launchBarPose2 = ({
 
   const wristL = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST]
 
+  // REF: один из примеров дублирующегося шаблона вычисления 
+  //      - подобное есть в tiedownsRemovedPoses
   const leftWristOnRightElbow =
     areCoordsClose(wristL.x, elbowR.x) && areCoordsClose(wristL.y, elbowR.y)
 

@@ -10,6 +10,7 @@ export const wheelChocksRemovedPose = ({
   Results,
   'poseLandmarks' | 'rightHandLandmarks' | 'leftHandLandmarks'
 >): boolean => {
+  // REF: handsNotDetected()
   if (!rightHandLandmarks || !leftHandLandmarks) return false
 
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
@@ -40,6 +41,7 @@ export const wheelChocksRemovedPose = ({
   const ringMcpL = leftHandLandmarks[13]
   const pinkyMcpL = leftHandLandmarks[17]
 
+  // REF: lowerThan, higherThan, outsideOf, insideOf, closeToEachOther
   const rightSide =
     wristR.y < nose.y &&
     shoulderR.x > elbowR.x &&

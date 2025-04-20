@@ -1,3 +1,4 @@
+// REF: неинтуитивное название файла. Переименовать в posesIndex.ts?
 export { idlePose } from './idlePose'
 export {
   removeTiedownsPose1,

@@ -50,6 +50,7 @@ export const unfoldWingsPose2 = ({
   const wristL = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST]
   const hipL = poseLandmarks[POSE_LANDMARKS.LEFT_HIP]
 
+  // REF: заменить функциональным подходом? (через .every())
   const onHorizLine =
     areCoordsClose(wristL.y, elbowL.y) &&
     areCoordsClose(elbowL.y, shoulderL.y) &&
@@ -57,6 +58,8 @@ export const unfoldWingsPose2 = ({
     areCoordsClose(shoulderR.y, elbowR.y) &&
     areCoordsClose(elbowR.y, wristR.y)
 
+  // REF: тоже функциональный подход; allHigherThan();
+  //      сделать названия однородными (onHorizLine, orderOnHoriz или через XAxis)
   const orderOnXAxis =
     wristL.x > elbowL.x &&
     elbowL.x > shoulderL.x &&

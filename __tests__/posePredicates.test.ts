@@ -1,5 +1,6 @@
 import { idlePose, unfoldWingsPose, moveAheadPose } from '../src/pose_predicate'
 
+// NITPICK: Данные тестов хотелось бы всё-таки загружать из отдельного json
 const idlePoseTrue1 = {
   poseLandmarks: [
     { x: 0, y: 0, z: 0 },
